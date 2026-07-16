@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordly — Dictionary SPA</title>
+    <link rel="stylesheet" href="style.css">
+    
+</head>
+<body>
+
+    <header>
+        <h1>WORDLY</h1>
+        <p>Welcome to my page</p>
+        <p>Let's learn a new word 😎</p>
+        <button id="themeToggle" class="theme-btn" type="button"
+         aria-label="Toggle dark or light theme">🌙</button>
+    </header>
+
+    <main>
+        <!-- Search Section -->
+        <section class="search-section">
+            <form id="searchForm">
+                <label for="wordInput">Search for a word</label>
+                <div class="search-container">
+                    <input
+                        type="text"
+                        id="wordInput"
+                        name="wordInput"
+                        placeholder="Type your word"
+                        
+                    >
+                    <button class="btn" type="submit">Search</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Messages Section -->
+        <section class="message-section">
+            <p id="loadingMessage" class="loading hidden" role="status">Loading...</p>
+            <p id="errorMessage" class="error hidden" role="alert"></p>
+        </section>
+
+        <!-- Results Section -->
+        <section class="results-section" id="resultsSection">
+            <div id="resultCard" class="result-card hidden">
+                <div class="word-header">
+                    <h2 id="resultWord"></h2>
+                    <span id="resultPhonetic" class="phonetic"></span>
+                    <button id="audioBtn" class="icon-btn hidden" type="button" 
+                    aria-label="Play pronunciation">🔊</button>
+                    <button id="favoriteBtn" class="favorite-btn" type="button" 
+                    aria-label="Save word to favorites">☆ Save</button>
+                </div>
+                <div id="meaningsContainer"></div>
+                <a id="sourceLink" class="source-link hidden" href="#" target="_blank" 
+                rel="noopener noreferrer">Source</a>
+            </div>
+        </section>
+
+        <!-- Favorites Section -->
+        <section class="favorites-section">
+            <h2>Favorites</h2>
+            <p id="favoritesEmpty" class="favorites-empty">No favorite words saved yet.</p>
+            <ul id="favoritesList" class="favorites-list"></ul>
+        </section>
+        <script src="index.js" defer></script>
+    </main>
+
+    <footer>
+        <p>Powered by the Stark industries</p>
+    </footer>
+
+</body>
+</html>

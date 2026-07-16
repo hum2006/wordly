@@ -1,0 +1,152 @@
+/* ===== Base styles ===== */
+* { box-sizing: border-box; } /* Make sizing easier to manage */
+
+body {
+  margin: 0;
+  padding: 0 16px 60px;
+  background-color: #1b022e; /* Dark purple background */
+  color: azure;              /* Light text color */
+  text-align: center;
+  line-height: 1.6;
+  transition: background-color 0.2s ease, color 0.2s ease; /* Smooth theme switch */
+}
+
+body.light-theme {
+  background-color: #f4f1ea; /* Light background */
+  color: #1b022e;            /* Dark text */
+}
+
+main { max-width: 700px; margin: 0 auto; } /* Center content */
+
+h1 {
+  color: aqua;               /* Aqua heading */
+  text-align: center;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+
+header { position: relative; padding-top: 24px; margin-bottom: 24px; }
+header p { margin-top: 0; opacity: 0.85; } /* Subtitle text */
+
+/* ===== Theme button ===== */
+.theme-btn {
+  position: absolute; top: 20px; right: 0;
+  background: none; border: 1px solid aqua;
+  border-radius: 50%; width: 40px; height: 40px;
+  font-size: 18px; cursor: pointer; color: azure;
+}
+body.light-theme .theme-btn { color: #1b022e; border-color: #6a3fa0; }
+
+/* ===== Sections ===== */
+section { margin-bottom: 32px; }
+
+/* ===== Search box ===== */
+.search-container {
+  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+}
+label[for="wordInput"] { display: block; margin-bottom: 8px; font-weight: bold; }
+
+#wordInput {
+  flex: 1 1 250px; max-width: 320px;
+  padding: 12px 14px; border-radius: 6px;
+  border: 1px solid #6a3fa0; background-color: #2a0b45;
+  color: azure; font-size: 16px;
+}
+body.light-theme #wordInput { background-color: #fff; color: #1b022e; }
+
+/* Focus outline for inputs and buttons */
+#wordInput:focus-visible,
+.btn:focus-visible,
+.icon-btn:focus-visible,
+.favorite-btn:focus-visible,
+.theme-btn:focus-visible {
+  outline: 3px solid aqua; outline-offset: 2px;
+}
+
+/* Search button */
+.btn {
+  background-color: #6a3fa0; color: #fff;
+  font-size: 16px; font-weight: bold;
+  padding: 12px 24px; border: none; border-radius: 6px;
+  cursor: pointer; transition: all 0.2s ease;
+}
+.btn:hover, .btn:focus-visible { background-color: orange; transform: translateY(-2px); }
+.btn:active { transform: translateY(0); }
+.btn:disabled { background-color: #555; cursor: not-allowed; }
+
+/* ===== Messages ===== */
+.loading { color: aqua; font-style: italic; }
+.error { color: #ff6b6b; font-weight: bold; }
+.hidden { display: none !important; }
+
+/* ===== Results card ===== */
+.result-card {
+  background-color: #2a0b45; border-radius: 10px; padding: 20px;
+  text-align: left; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  overflow-wrap: break-word;
+}
+body.light-theme .result-card { background-color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+.word-header {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+  border-bottom: 1px solid #6a3fa0; padding-bottom: 12px; margin-bottom: 12px;
+}
+.word-header h2 { margin: 0; color: aqua; text-transform: capitalize; }
+.phonetic { opacity: 0.8; font-style: italic; }
+
+/* Audio + favorite buttons */
+.icon-btn {
+  background: none; border: 1px solid #6a3fa0; border-radius: 50%;
+  width: 36px; height: 36px; cursor: pointer; font-size: 16px;
+}
+.favorite-btn {
+  margin-left: auto; background: none; border: 1px solid orange; color: orange;
+  padding: 8px 14px; border-radius: 6px; font-weight: bold;
+}
+.favorite-btn.saved { background-color: orange; color: #1b022e; }
+
+/* Meanings and definitions */
+.meaning-block { margin-bottom: 18px; }
+.meaning-block h3 { color: orange; margin-bottom: 6px; text-transform: capitalize; }
+.definition-item { margin-bottom: 10px; padding-left: 16px; }
+.definition-example { opacity: 0.85; font-style: italic; margin: 4px 0 0; }
+
+/* Synonyms */
+.synonyms { margin-top: 6px; font-size: 14px; }
+.synonyms span {
+  background-color: #3d1266; border-radius: 4px; padding: 2px 8px;
+  margin: 2px 4px 2px 0; display: inline-block;
+}
+body.light-theme .synonyms span { background-color: #e6ddf5; color: #1b022e; }
+
+/* Source link */
+.source-link { display: inline-block; margin-top: 10px; color: aqua; word-break: break-all; }
+body.light-theme .source-link { color: #6a3fa0; }
+
+/* ===== Favorites section ===== */
+.favorites-section h2 { color: aqua; }
+.favorites-empty { opacity: 0.7; }
+.favorites-list {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+}
+.favorite-item {
+  background-color: #2a0b45; border: 1px solid #6a3fa0; border-radius: 8px;
+  padding: 8px 10px; display: flex; align-items: center; gap: 8px;
+}
+body.light-theme .favorite-item { background-color: #fff; }
+.favorite-item.active { border-color: orange; box-shadow: 0 0 0 1px orange; }
+.favorite-word-btn { background: none; border: none; color: azure; font-weight: bold; text-transform: capitalize; }
+body.light-theme .favorite-word-btn { color: #1b022e; }
+.favorite-remove-btn { background: none; border: none; color: #ff6b6b; cursor: pointer; font-size: 16px; }
+
+/* ===== Footer ===== */
+footer { text-align: center; opacity: 0.6; font-size: 13px; margin-top: 40px; }
+
+/* ===== Responsive (mobile) ===== */
+@media (max-width: 480px) {
+  .search-container { flex-direction: column; align-items: stretch; }
+  #wordInput { max-width: 100%; }
+  .word-header { flex-direction: column; align-items: flex-start; }
+  .favorite-btn { margin-left: 0; }
+}
