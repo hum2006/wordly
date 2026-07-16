@@ -1,10 +1,9 @@
-// ===== Wordly Dictionary SPA =====
 
-const API_BASE = "https://api.dictionaryapi.dev/api/v2/entries/en/";
+const API_BASE = "https://api.dictionaryapi.dev/api/v2/entries/en/"; 
 const FAVORITES_KEY = "wordly_favorites";
 const THEME_KEY = "wordly_theme";
 
-// ---- Element references ----
+
 const searchForm = document.getElementById("searchForm");
 const wordInput = document.getElementById("wordInput");
 const searchBtn = searchForm.querySelector(".btn");
@@ -25,67 +24,71 @@ const favoritesList = document.getElementById("favoritesList");
 
 const themeToggle = document.getElementById("themeToggle");
 
-// ---- State ----
-let currentAudioUrl = null;
-let currentAudio = null;
-let currentWord = null;
-let currentPhoneticText = "";
+//initializations
+let currentAudioUrl = null; // Stores audio url for pronunciation
+let currentAudio = null; // Audio object for playback
+let currentWord = null; // Currently searched word
+let currentPhoneticText = ""; // Phonetic spelling of the word
 
-// =====================================================
-// Initialization
-// =====================================================
 document.addEventListener("DOMContentLoaded", () => {
-    displayFavorites();
-    restoreTheme();
+    displayFavorites(); // Load saved favorites on startup
+    restoreTheme(); // Restore theme preference
 });
 
+// Event listeners for user interactions
 searchForm.addEventListener("submit", handleSearch);
 audioBtn.addEventListener("click", playAudio);
 favoriteBtn.addEventListener("click", toggleFavoriteForCurrentWord);
 themeToggle.addEventListener("click", toggleTheme);
 
-// =====================================================
-// Search handling
-// =====================================================
+// Search Handling
 function handleSearch(event) {
-    event.preventDefault();
+    event.preventDefault(); //stop the form from refreshing the page
 
     const rawValue = wordInput.value;
     const word = rawValue.trim().toLowerCase();
 
-    clearErrors();
+    clearErrors(); //remove previous error messages before new search
 
     if (!word) {
         displayError("Please enter a word.");
         return;
     }
 
-    clearResults();
-    setLoading(true);
-    fetchWord(word);
+    clearResults(); //clear previous results
+    setLoading(true); // show "loading" and disable the button 
+    fetchWord(word); // Fetch word definition from API
 }
 
 async function fetchWord(word) {
     try {
-        const response = await fetch(`${API_BASE}${encodeURIComponent(word)}`);
+        const response = await fetch(`${API_BASE}${encodeURIComponent(word)}`); 
+        /*encodeURIComponent(word) ensures special characters 
+        (like spaces or punctuation) don’t break the URL.*/
 
         if (!response.ok) {
+            // Handle errors 
             if (response.status === 404) {
-                displayError("We could not find that word. Check the spelling and try again.");
+                //error 404 means server was reached bur resource wasn't there
+                displayError("We could not find that word. Check the spelling and try again."); 
+
             } else {
                 displayError("Something went wrong while loading the definition. Please try again.");
             }
             return;
         }
 
+        //convert API response to js array
         const data = await response.json();
 
+
+        //validation if the API returns an empty value
         if (!Array.isArray(data) || data.length === 0 || !data[0]) {
             displayError("Something went wrong while loading the definition. Please try again.");
             return;
         }
 
-        displayWord(data[0]);
+        displayWord(data[0]); //function to Show word details
     } catch (err) {
         displayError("Something went wrong while loading the definition. Please try again.");
     } finally {
@@ -93,12 +96,11 @@ async function fetchWord(word) {
     }
 }
 
-// =====================================================
-// Display
-// =====================================================
+// Display Functions
 function displayWord(entry) {
     clearResults();
 
+    // Set current word and phonetic details
     currentWord = entry.word || wordInput.value.trim();
     currentPhoneticText = getPhoneticText(entry);
     currentAudioUrl = getAudioUrl(entry);
@@ -106,7 +108,7 @@ function displayWord(entry) {
     resultWord.textContent = currentWord;
     resultPhonetic.textContent = currentPhoneticText;
 
-    // Audio button
+    // Handle audio pronunciation
     if (currentAudioUrl) {
         audioBtn.classList.remove("hidden");
         currentAudio = new Audio(currentAudioUrl);
@@ -115,7 +117,7 @@ function displayWord(entry) {
         currentAudio = null;
     }
 
-    // Meanings
+    // Display meanings and definitions
     const meanings = Array.isArray(entry.meanings) ? entry.meanings : [];
     meanings.forEach((meaning) => {
         const block = document.createElement("div");
@@ -144,6 +146,7 @@ function displayWord(entry) {
             block.appendChild(defItem);
         });
 
+        // Display synonyms if available
         const synonyms = getSynonyms(meaning);
         if (synonyms.length > 0) {
             const synWrap = document.createElement("div");
@@ -165,7 +168,7 @@ function displayWord(entry) {
         meaningsContainer.appendChild(block);
     });
 
-    // Source link
+    // Display source link if available
     if (Array.isArray(entry.sourceUrls) && entry.sourceUrls.length > 0 && entry.sourceUrls[0]) {
         sourceLink.href = entry.sourceUrls[0];
         sourceLink.textContent = "View source";
@@ -178,9 +181,9 @@ function displayWord(entry) {
     resultCard.classList.remove("hidden");
 }
 
+// Helper functions for phonetics, audio, and synonyms
 function getPhoneticText(entry) {
     if (entry.phonetic) return entry.phonetic;
-
     const phonetics = Array.isArray(entry.phonetics) ? entry.phonetics : [];
     const withText = phonetics.find((p) => p.text);
     return withText ? withText.text : "";
@@ -197,20 +200,19 @@ function getSynonyms(meaning) {
     const definitionLevel = Array.isArray(meaning.definitions)
         ? meaning.definitions.flatMap((def) => (Array.isArray(def.synonyms) ? def.synonyms : []))
         : [];
-
-    const combined = [...meaningLevel, ...definitionLevel];
-    return [...new Set(combined)];
+    return [...new Set([...meaningLevel, ...definitionLevel])]; // Remove duplicates
 }
 
+//remove previous error messages before new search
 function clearResults() {
-    meaningsContainer.innerHTML = "";
-    resultWord.textContent = "";
-    resultPhonetic.textContent = "";
-    sourceLink.classList.add("hidden");
-    audioBtn.classList.add("hidden");
-    resultCard.classList.add("hidden");
-    currentAudio = null;
-    currentAudioUrl = null;
+    meaningsContainer.innerHTML = "";   // Remove all previous meanings
+    resultWord.textContent = "";        // Clear the displayed word
+    resultPhonetic.textContent = "";    // Clear the phonetic spelling
+    sourceLink.classList.add("hidden"); // Hide the source link
+    audioBtn.classList.add("hidden");   // Hide the audio button
+    resultCard.classList.add("hidden"); // Hide the entire result card
+    currentAudio = null;                // Reset audio object
+    currentAudioUrl = null;             // Reset audio URL
 }
 
 function displayError(message) {
@@ -223,17 +225,17 @@ function clearErrors() {
     errorMessage.classList.add("hidden");
 }
 
+// show "loading" and disable the button 
 function setLoading(isLoading) {
     loadingMessage.classList.toggle("hidden", !isLoading);
     searchBtn.disabled = isLoading;
 }
 
 // =====================================================
-// Audio playback
+// Audio Playback
 // =====================================================
 function playAudio() {
     if (!currentAudio) return;
-
     currentAudio.play().catch(() => {
         displayError("Audio could not be played right now.");
     });
@@ -258,9 +260,7 @@ function isFavorite(word) {
 
 function saveFavorite(word, phonetic) {
     const favorites = getFavorites();
-
     if (isFavorite(word)) return;
-
     favorites.push({ word, phonetic: phonetic || "" });
     localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
     displayFavorites();
@@ -276,82 +276,15 @@ function removeFavorite(word) {
 
 function toggleFavoriteForCurrentWord() {
     if (!currentWord) return;
-
     if (isFavorite(currentWord)) {
         removeFavorite(currentWord);
     } else {
         saveFavorite(currentWord, currentPhoneticText);
     }
-
     updateFavoriteButton();
 }
 
-function updateFavoriteButton() {
-    if (!currentWord) return;
-
-    const saved = isFavorite(currentWord);
-    favoriteBtn.textContent = saved ? "★ Saved" : "☆ Save";
-    favoriteBtn.classList.toggle("saved", saved);
-    highlightActiveFavorite();
-}
-
-function displayFavorites() {
-    const favorites = getFavorites();
-    favoritesList.innerHTML = "";
-
-    if (favorites.length === 0) {
-        favoritesEmpty.classList.remove("hidden");
-    } else {
-        favoritesEmpty.classList.add("hidden");
-    }
-
-    favorites.forEach((fav) => {
-        const item = document.createElement("li");
-        item.className = "favorite-item";
-        if (currentWord && currentWord.toLowerCase() === fav.word.toLowerCase()) {
-            item.classList.add("active");
-        }
-
-        const wordBtn = document.createElement("button");
-        wordBtn.className = "favorite-word-btn";
-        wordBtn.type = "button";
-        wordBtn.textContent = fav.word;
-        wordBtn.setAttribute("aria-label", `Search again for ${fav.word}`);
-        wordBtn.addEventListener("click", () => {
-            wordInput.value = fav.word;
-            searchForm.requestSubmit();
-        });
-
-        const removeBtn = document.createElement("button");
-        removeBtn.className = "favorite-remove-btn";
-        removeBtn.type = "button";
-        removeBtn.textContent = "✕";
-        removeBtn.setAttribute("aria-label", `Remove ${fav.word} from favorites`);
-        removeBtn.addEventListener("click", () => {
-            removeFavorite(fav.word);
-            updateFavoriteButton();
-        });
-
-        item.appendChild(wordBtn);
-        item.appendChild(removeBtn);
-        favoritesList.appendChild(item);
-    });
-}
-
-function highlightActiveFavorite() {
-    const items = favoritesList.querySelectorAll(".favorite-item");
-    items.forEach((item) => {
-        const label = item.querySelector(".favorite-word-btn").textContent;
-        item.classList.toggle(
-            "active",
-            currentWord && label.toLowerCase() === currentWord.toLowerCase()
-        );
-    });
-}
-
-// =====================================================
 // Theme toggle
-// =====================================================
 function toggleTheme() {
     const isLight = document.body.classList.toggle("light-theme");
     themeToggle.textContent = isLight ? "☀️" : "🌙";
@@ -363,5 +296,19 @@ function restoreTheme() {
     if (saved === "light") {
         document.body.classList.add("light-theme");
         themeToggle.textContent = "☀️";
+    }
+}
+
+
+function updateFavoriteButton() {
+    if (!currentWord) return;
+    const saved = isFavorite(currentWord);
+
+    if (saved) {
+        favoriteBtn.textContent = "Saved";
+        favoriteBtn.classList.add("saved");
+    } else {
+        favoriteBtn.textContent = "Save";
+        favoriteBtn.classList.remove("saved");
     }
 }
