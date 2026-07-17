@@ -25,7 +25,7 @@ Wordly is a Single Page Application (SPA) dictionary tool. Users can search for 
 1. Clone or download the repository.
 2. Open the `wordly` project folder.
 3. Open `index.html` in a browser, or run it with the VS Code "Live Server" extension.
-4. Enter a word in the search field and click **Search**.
+4. Enter a word in the search field and click "Search".
 
 # API Information
 `https://api.dictionaryapi.dev/api/v2/entries/en/{word}`

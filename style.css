@@ -132,15 +132,31 @@ body.light-theme .result-card {
    background-color: #fff;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
-.word-header {
-  display: flex;
-   align-items: center; 
-   flex-wrap: wrap;
-    gap: 10px;
-  border-bottom: 1px solid #6a3fa0;
-   padding-bottom: 12px;
-    margin-bottom: 12px;
+.word-header { 
+  display: flex; 
+  align-items: center; 
+  flex-wrap: wrap; 
+  gap: 10px; 
+  border-bottom: 1px solid #6a3fa0; 
+  padding-bottom: 12px; 
+  margin-bottom: 12px; 
+  position: relative; /* ✅ ensures stacking context */
 }
+
+.favorite-btn {
+  margin-left: auto;
+  background: none;
+  border: 1px solid orange;
+  color: orange;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;        /* ✅ clickable */
+  position: relative;     /* ✅ above siblings */
+  z-index: 5;
+  pointer-events: auto;
+}
+
 
 
 
@@ -152,15 +168,7 @@ body.light-theme .result-card {
    cursor: pointer; 
    font-size: 16px;
 }
-.favorite-btn {
-  margin-left: auto;
-   background: none;
-    border: 1px solid orange; 
-    color: orange;
-  padding: 8px 14px;
-   border-radius: 6px; 
-   font-weight: bold;
-}
+
 .favorite-btn.saved {
    background-color: orange;
     color: #1b022e;
@@ -208,4 +216,3 @@ footer {
   font-size: 13px; 
   margin-top: 40px;
  }
-

@@ -1,16 +1,12 @@
-
-const API_BASE = "https://api.dictionaryapi.dev/api/v2/entries/en/"; 
+const API_BASE = "https://api.dictionaryapi.dev/api/v2/entries/en/";
 const FAVORITES_KEY = "wordly_favorites";
 const THEME_KEY = "wordly_theme";
-
 
 const searchForm = document.getElementById("searchForm");
 const wordInput = document.getElementById("wordInput");
 const searchBtn = searchForm.querySelector(".btn");
-
 const loadingMessage = document.getElementById("loadingMessage");
 const errorMessage = document.getElementById("errorMessage");
-
 const resultCard = document.getElementById("resultCard");
 const resultWord = document.getElementById("resultWord");
 const resultPhonetic = document.getElementById("resultPhonetic");
@@ -18,10 +14,8 @@ const audioBtn = document.getElementById("audioBtn");
 const favoriteBtn = document.getElementById("favoriteBtn");
 const meaningsContainer = document.getElementById("meaningsContainer");
 const sourceLink = document.getElementById("sourceLink");
-
 const favoritesEmpty = document.getElementById("favoritesEmpty");
 const favoritesList = document.getElementById("favoritesList");
-
 const themeToggle = document.getElementById("themeToggle");
 
 //initializations
@@ -30,10 +24,13 @@ let currentAudio = null; // Audio object for playback
 let currentWord = null; // Currently searched word
 let currentPhoneticText = ""; // Phonetic spelling of the word
 
+// When the page finishes loading, immediately show any saved favorites
+// and apply the last chosen theme (light or dark).
 document.addEventListener("DOMContentLoaded", () => {
-    displayFavorites(); // Load saved favorites on startup
-    restoreTheme(); // Restore theme preference
+    displayFavorites();
+    restoreTheme();
 });
+
 
 // Event listeners for user interactions
 searchForm.addEventListener("submit", handleSearch);
@@ -54,23 +51,22 @@ function handleSearch(event) {
         displayError("Please enter a word.");
         return;
     }
-
     clearResults(); //clear previous results
-    setLoading(true); // show "loading" and disable the button 
+    setLoading(true); // show "loading" and disable the button
     fetchWord(word); // Fetch word definition from API
 }
 
 async function fetchWord(word) {
     try {
-        const response = await fetch(`${API_BASE}${encodeURIComponent(word)}`); 
-        /*encodeURIComponent(word) ensures special characters 
+        const response = await fetch(`${API_BASE}${encodeURIComponent(word)}`);
+        /*encodeURIComponent(word) ensures special characters
         (like spaces or punctuation) don’t break the URL.*/
 
         if (!response.ok) {
-            // Handle errors 
+            // Handle errors
             if (response.status === 404) {
                 //error 404 means server was reached bur resource wasn't there
-                displayError("We could not find that word. Check the spelling and try again."); 
+                displayError("We could not find that word. Check the spelling and try again.");
 
             } else {
                 displayError("Something went wrong while loading the definition. Please try again.");
@@ -80,7 +76,6 @@ async function fetchWord(word) {
 
         //convert API response to js array
         const data = await response.json();
-
 
         //validation if the API returns an empty value
         if (!Array.isArray(data) || data.length === 0 || !data[0]) {
@@ -100,15 +95,16 @@ async function fetchWord(word) {
 function displayWord(entry) {
     clearResults();
 
-    // Set current word and phonetic details
+    // Set current word and phonetic spelling
     currentWord = entry.word || wordInput.value.trim();
-    currentPhoneticText = getPhoneticText(entry);
-    currentAudioUrl = getAudioUrl(entry);
+     const { text, audio } = getPhonetics(entry);
+         currentPhoneticText = text;
+        currentAudioUrl = audio;
 
     resultWord.textContent = currentWord;
     resultPhonetic.textContent = currentPhoneticText;
 
-    // Handle audio pronunciation
+    // If audio is available, show the button and prepare playback
     if (currentAudioUrl) {
         audioBtn.classList.remove("hidden");
         currentAudio = new Audio(currentAudioUrl);
@@ -117,7 +113,7 @@ function displayWord(entry) {
         currentAudio = null;
     }
 
-    // Display meanings and definitions
+    // Loop through meanings and show definitions, examples, and synonyms
     const meanings = Array.isArray(entry.meanings) ? entry.meanings : [];
     meanings.forEach((meaning) => {
         const block = document.createElement("div");
@@ -146,7 +142,7 @@ function displayWord(entry) {
             block.appendChild(defItem);
         });
 
-        // Display synonyms if available
+        // add and display synonyms if available
         const synonyms = getSynonyms(meaning);
         if (synonyms.length > 0) {
             const synWrap = document.createElement("div");
@@ -182,17 +178,11 @@ function displayWord(entry) {
 }
 
 // Helper functions for phonetics, audio, and synonyms
-function getPhoneticText(entry) {
-    if (entry.phonetic) return entry.phonetic;
-    const phonetics = Array.isArray(entry.phonetics) ? entry.phonetics : [];
-    const withText = phonetics.find((p) => p.text);
-    return withText ? withText.text : "";
-}
-
-function getAudioUrl(entry) {
-    const phonetics = Array.isArray(entry.phonetics) ? entry.phonetics : [];
-    const withAudio = phonetics.find((p) => p.audio);
-    return withAudio ? withAudio.audio : null;
+function getPhonetics(entry) {
+  const phonetics = Array.isArray(entry.phonetics) ? entry.phonetics : [];
+  const text = entry.phonetic || (phonetics.find(p => p.text)?.text || "");
+  const audio = phonetics.find(p => p.audio)?.audio || null;
+  return { text, audio };
 }
 
 function getSynonyms(meaning) {
@@ -225,15 +215,13 @@ function clearErrors() {
     errorMessage.classList.add("hidden");
 }
 
-// show "loading" and disable the button 
+// show "loading" and disable the button
 function setLoading(isLoading) {
     loadingMessage.classList.toggle("hidden", !isLoading);
     searchBtn.disabled = isLoading;
 }
 
-// =====================================================
 // Audio Playback
-// =====================================================
 function playAudio() {
     if (!currentAudio) return;
     currentAudio.play().catch(() => {
@@ -241,9 +229,7 @@ function playAudio() {
     });
 }
 
-// =====================================================
-// Favorites (localStorage)
-// =====================================================
+// Favorites
 function getFavorites() {
     try {
         const raw = localStorage.getItem(FAVORITES_KEY);
@@ -299,7 +285,6 @@ function restoreTheme() {
     }
 }
 
-
 function updateFavoriteButton() {
     if (!currentWord) return;
     const saved = isFavorite(currentWord);
@@ -311,4 +296,30 @@ function updateFavoriteButton() {
         favoriteBtn.textContent = "Save";
         favoriteBtn.classList.remove("saved");
     }
+}
+
+// Favorites display function
+function displayFavorites() {
+    const favorites = getFavorites();
+    favoritesList.innerHTML = ""; // clear old list
+
+    if (favorites.length === 0) {
+        favoritesEmpty.classList.remove("hidden");
+        return;
+    }
+
+    favoritesEmpty.classList.add("hidden");
+
+    favorites.forEach((fav) => {
+        const li = document.createElement("li");
+        li.textContent = `${fav.word} ${fav.phonetic ? `(${fav.phonetic})` : ""}`;
+
+        // Make favorites clickable to re-search
+        li.addEventListener("click", () => {
+            wordInput.value = fav.word;
+            handleSearch(new Event("submit"));
+        });
+
+        favoritesList.appendChild(li);
+    });
 }
