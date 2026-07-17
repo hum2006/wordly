@@ -39,9 +39,10 @@ Wordly is a Single Page Application (SPA) dictionary tool. Users can search for 
 5. Click "Save" to add the word to Favorites, or click a saved word to search it again.
 
 # Screenshots and live Demo
-![Alt text](images\image.png)
-![Alt text](images\Screenshot 2026-07-16 203621.png)
-![Alt text](images\Screenshot 2026-07-16 203711.png)
+![Homepage view](images/image.png)
+![Feature demo 1](images/Screenshot-2026-07-16-203621.png)
+![Feature demo 2](images/Screenshot-2026-07-16-203711.png)
+
 
 # Known Limitations
 - Some words lack audio, examples, or synonyms, depending on API availability.
